@@ -1,9 +1,19 @@
 package de.bcxp.challenge.data;
 
+import com.opencsv.bean.CsvBindByName;
+
 public class WeatherBean {
-    private final int day;
-    private final int minimumTemperature;
-    private final int maximumTemperature;
+    @CsvBindByName
+    private int day;
+
+    @CsvBindByName(column = "MnT")
+    private int minimumTemperature;
+
+    @CsvBindByName(column = "MxT")
+    private int maximumTemperature;
+
+    public WeatherBean() {
+    }
 
     public WeatherBean(int day, int minimumTemperature, int maximumTemperature) {
         this.day = day;

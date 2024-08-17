@@ -1,18 +1,31 @@
 package de.bcxp.challenge.parsing;
 
-import de.bcxp.challenge.evaluator.IEvaluable;
+import com.opencsv.bean.CsvToBeanBuilder;
+import de.bcxp.challenge.data.WeatherBean;
+import de.bcxp.challenge.evaluator.WeatherEvaluator;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class CSVFileParser<TData, TValue, TEvaluator extends IEvaluable<TData, TValue>> implements IFileParser<TData, TValue, TEvaluator> {
-    public TEvaluator parse(Path path) {
-        Optional<TEvaluator> best = Optional.empty();
+public class CSVFileParser {
+    public WeatherEvaluator parse(Path path) throws IOException, UnableToParseFileContentException {
+        Optional<WeatherEvaluator> best = Optional.empty();
 
-        if (best.isPresent()) {
-            return best.get();
-        } else {
-            throw new EmptyFileException();
+        try (Reader reader = Files.newBufferedReader(path)) {
+            for (final WeatherBean data : new CsvToBeanBuilder<WeatherBean>(reader)
+                    .withType(WeatherBean.class)
+                    .build()) {
+                WeatherEvaluator evaluated_data = new WeatherEvaluator(data);
+
+                if (best.isEmpty() || best.get().getValue().compareTo(evaluated_data.getValue()) > 0) {
+                    best = Optional.of(evaluated_data);
+                }
+            }
         }
+
+        return best.orElseThrow(UnableToParseFileContentException::new);
     }
 }

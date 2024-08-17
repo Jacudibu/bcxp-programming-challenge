@@ -1,6 +1,5 @@
 package de.bcxp.challenge.parsing;
 
-import de.bcxp.challenge.data.WeatherBean;
 import de.bcxp.challenge.evaluator.WeatherEvaluator;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -15,24 +14,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CSVFileParserTest {
     @NotNull
     private Path getPath(String fileName) {
-        return Paths.get("src/test/resources/" + fileName);
+        return Paths.get("src", "test", "resources", "de.bcxp.challenge", fileName);
     }
 
     @NotNull
-    private WeatherEvaluator parseWeather(String fileName) {
+    private WeatherEvaluator parseWeather(String fileName) throws IOException {
         Path path = getPath(fileName);
-        CSVFileParser<WeatherBean, Integer, WeatherEvaluator> parser = new CSVFileParser<>();
+        CSVFileParser parser = new CSVFileParser();
         return parser.parse(path);
     }
 
     @Test
-    void singleElement_shouldWork() {
+    void singleElement_shouldWork() throws Exception {
         WeatherEvaluator result = parseWeather("single_weather.csv");
         assertEquals(1, result.getData().getDay());
     }
 
     @Test
-    void weatherFile_shouldWork() {
+    void weatherFile_shouldWork() throws Exception {
         WeatherEvaluator result = parseWeather("weather.csv");
         assertEquals(14, result.getData().getDay());
     }
@@ -44,11 +43,11 @@ public class CSVFileParserTest {
 
     @Test
     void emptyFile_shouldThrow() {
-        assertThrows(EmptyFileException.class, () -> parseWeather("empty.csv"));
+        assertThrows(UnableToParseFileContentException.class, () -> parseWeather("empty.csv"));
     }
 
     @Test
     void invalidData_shouldThrow() {
-        assertThrows(InvalidFileContentException.class, () ->  parseWeather("invalid.csv"));
+        assertThrows(UnableToParseFileContentException.class, () -> parseWeather("invalid.csv"));
     }
 }
