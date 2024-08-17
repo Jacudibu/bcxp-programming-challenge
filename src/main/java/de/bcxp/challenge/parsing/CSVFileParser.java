@@ -1,11 +1,18 @@
 package de.bcxp.challenge.parsing;
 
-import jdk.jshell.spi.ExecutionControl;
+import de.bcxp.challenge.evaluator.IEvaluable;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
-public abstract class CSVFileParser {
-    public static int parse(Path path) throws ExecutionControl.NotImplementedException {
-        throw new ExecutionControl.NotImplementedException("Not Implemented");
+public class CSVFileParser<TData, TValue, TEvaluator extends IEvaluable<TData, TValue>> implements IFileParser<TData, TValue, TEvaluator> {
+    public TEvaluator parse(Path path) {
+        Optional<TEvaluator> best = Optional.empty();
+
+        if (best.isPresent()) {
+            return best.get();
+        } else {
+            throw new EmptyFileException();
+        }
     }
 }

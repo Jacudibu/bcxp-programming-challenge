@@ -1,6 +1,7 @@
 package de.bcxp.challenge.parsing;
 
-import jdk.jshell.spi.ExecutionControl;
+import de.bcxp.challenge.data.WeatherBean;
+import de.bcxp.challenge.evaluator.WeatherEvaluator;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
@@ -17,35 +18,37 @@ public class CSVFileParserTest {
         return Paths.get("src/test/resources/" + fileName);
     }
 
-    @Test
-    void singleElement_shouldWork() throws ExecutionControl.NotImplementedException {
-        Path path = getPath("singe_weather.csv");
-        int result = CSVFileParser.parse(path);
-        assertEquals(1, result);
+    @NotNull
+    private WeatherEvaluator parseWeather(String fileName) {
+        Path path = getPath(fileName);
+        CSVFileParser<WeatherBean, Integer, WeatherEvaluator> parser = new CSVFileParser<>();
+        return parser.parse(path);
     }
 
     @Test
-    void weatherFile_shouldWork() throws ExecutionControl.NotImplementedException {
-        Path path = getPath("single_weather.csv");
-        int result = CSVFileParser.parse(path);
-        assertEquals(14, result);
+    void singleElement_shouldWork() {
+        WeatherEvaluator result = parseWeather("single_weather.csv");
+        assertEquals(1, result.getData().getDay());
+    }
+
+    @Test
+    void weatherFile_shouldWork() {
+        WeatherEvaluator result = parseWeather("weather.csv");
+        assertEquals(14, result.getData().getDay());
     }
 
     @Test
     void invalidPath_shouldThrow() {
-        Path path = getPath("very_invalid.csv");
-        assertThrows(IOException.class, () -> CSVFileParser.parse(path));
+        assertThrows(IOException.class, () -> parseWeather("invalid_path.csv"));
     }
 
     @Test
     void emptyFile_shouldThrow() {
-        Path path = getPath("empty.csv");
-        assertThrows(EmptyFileException.class, () -> CSVFileParser.parse(path));
+        assertThrows(EmptyFileException.class, () -> parseWeather("empty.csv"));
     }
 
     @Test
     void invalidData_shouldThrow() {
-        Path path = getPath("invalid.csv");
-        assertThrows(InvalidFileContentException.class, () -> CSVFileParser.parse(path));
+        assertThrows(InvalidFileContentException.class, () ->  parseWeather("invalid.csv"));
     }
 }

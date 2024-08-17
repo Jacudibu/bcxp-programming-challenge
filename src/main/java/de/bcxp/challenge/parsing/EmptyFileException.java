@@ -1,7 +1,7 @@
 package de.bcxp.challenge.parsing;
 
 public class EmptyFileException extends RuntimeException {
-    public EmptyFileException(String message) {
-        super(message);
+    public EmptyFileException() {
+        super("The provided file was empty!");
     }
 }
