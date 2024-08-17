@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 public abstract class AbstractFileParser<TDataBean, TValue extends Comparable<TValue>> {
     private final Path path;
-    protected Optional<Class<? extends TDataBean>> type = Optional.empty();
+    private Optional<Class<? extends TDataBean>> type = Optional.empty();
     private Optional<Function<TDataBean, TValue>> evaluator = Optional.empty();
     private Ordering ordering = Ordering.Smallest;
 
