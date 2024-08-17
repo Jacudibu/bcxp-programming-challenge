@@ -26,7 +26,7 @@ public class CSVFileParserTest {
 
         return new CSVFileParser<WeatherBean, Integer>(path)
                 .withClass(WeatherBean.class)
-                .withEvaluationFunction(WeatherEvaluator::temperatureDifference)
+                .withEvaluationFunction(WeatherEvaluator::temperatureSpread)
                 .withOrdering(Ordering.Smallest)
                 .parse();
     }

@@ -35,7 +35,7 @@ public final class App {
         try {
             FileParserResult<WeatherBean, Integer> result = new CSVFileParser<WeatherBean, Integer>(weatherPath)
                     .withClass(WeatherBean.class)
-                    .withEvaluationFunction(WeatherEvaluator::temperatureDifference)
+                    .withEvaluationFunction(WeatherEvaluator::temperatureSpread)
                     .withOrdering(Ordering.Smallest)
                     .parse();
 
