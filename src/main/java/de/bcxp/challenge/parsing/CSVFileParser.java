@@ -1,48 +1,62 @@
 package de.bcxp.challenge.parsing;
 
 import com.opencsv.bean.CsvToBeanBuilder;
-import de.bcxp.challenge.data.CountryBean;
-import de.bcxp.challenge.data.WeatherBean;
-import de.bcxp.challenge.evaluator.CountryEvaluator;
-import de.bcxp.challenge.evaluator.WeatherEvaluator;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Function;
 
-public class CSVFileParser {
-    public WeatherEvaluator parse(Path path) throws IOException, UnableToParseFileContentException {
-        Optional<WeatherEvaluator> best = Optional.empty();
+public class CSVFileParser<TDataBean, TValue extends Comparable<TValue>> implements IFileParser<TDataBean, TValue> {
+    private Path path;
+    private Optional<Class<? extends TDataBean>> type = Optional.empty();
+    private Optional<Function<TDataBean, TValue>> evaluator = Optional.empty();
+    private char separator = ',';
+    private Ordering ordering = Ordering.Smallest;
 
-        try (Reader reader = Files.newBufferedReader(path)) {
-            for (final WeatherBean data : new CsvToBeanBuilder<WeatherBean>(reader)
-                    .withType(WeatherBean.class)
-                    .build()) {
-                WeatherEvaluator evaluated_data = new WeatherEvaluator(data);
-
-                if (best.isEmpty() || best.get().getValue().compareTo(evaluated_data.getValue()) > 0) {
-                    best = Optional.of(evaluated_data);
-                }
-            }
-        }
-
-        return best.orElseThrow(UnableToParseFileContentException::new);
+    public CSVFileParser(Path path) {
+        this.path = path;
     }
 
-    public CountryEvaluator parse_country(Path path) throws IOException, UnableToParseFileContentException {
-        Optional<CountryEvaluator> best = Optional.empty();
+    public CSVFileParser<TDataBean, TValue> withClass(Class<? extends TDataBean> type) {
+        this.type = Optional.of(type);
+        return this;
+    }
 
-        try (Reader reader = Files.newBufferedReader(path)) {
-            for (final CountryBean data : new CsvToBeanBuilder<CountryBean>(reader)
-                    .withType(CountryBean.class)
-                    .withSeparator(';')
+    public CSVFileParser<TDataBean, TValue> withSeparator(char separator) {
+        this.separator = separator;
+        return this;
+    }
+
+    public CSVFileParser<TDataBean, TValue> withOrdering(Ordering ordering) {
+        this.ordering = ordering;
+        return this;
+    }
+
+    public CSVFileParser<TDataBean, TValue> withEvaluationFunction(Function<TDataBean, TValue> function) {
+        this.evaluator = Optional.of(function);
+        return this;
+    }
+
+    @Override
+    public FileParserResult<TDataBean, TValue> parse() throws IOException, ParserClassMissingException, ParserEvaluatorMissingException {
+        Optional<FileParserResult<TDataBean, TValue>> best = Optional.empty();
+
+        Class<? extends TDataBean> type = this.type.orElseThrow(ParserClassMissingException::new);
+        Function<TDataBean, TValue> evaluator = this.evaluator.orElseThrow(ParserEvaluatorMissingException::new);
+
+        try (Reader reader = Files.newBufferedReader(this.path)) {
+            for (final TDataBean data : new CsvToBeanBuilder<TDataBean>(reader)
+                    .withType(type)
+                    .withSeparator(this.separator)
                     .build()) {
-                CountryEvaluator evaluated_data = new CountryEvaluator(data);
 
-                if (best.isEmpty() || best.get().getValue().compareTo(evaluated_data.getValue()) < 0) {
-                    best = Optional.of(evaluated_data);
+                TValue evaluated_data = evaluator.apply(data);
+
+                if (best.isEmpty() || best.get().isOtherValueBetter(evaluated_data, this.ordering)) {
+                    best = Optional.of(new FileParserResult<>(data, evaluated_data));
                 }
             }
         }

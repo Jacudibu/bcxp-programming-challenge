@@ -7,11 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WeatherEvaluatorTest {
     @Test
-    public void evaluating() {
+    public void temperatureDifference() {
         WeatherBean bean = new WeatherBean(1, 5, 10);
-        WeatherEvaluator evaluator = new WeatherEvaluator(bean);
-
-        assertEquals(1, evaluator.getData().getDay());
-        assertEquals(5, evaluator.getValue());
+        assertEquals(5, WeatherEvaluator.temperatureDifference(bean));
     }
 }

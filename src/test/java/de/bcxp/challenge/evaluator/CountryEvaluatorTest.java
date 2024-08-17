@@ -8,11 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CountryEvaluatorTest {
     @Test
-    public void evaluating() {
+    public void populationDensity() {
         CountryBean bean = new CountryBean("MyIsland", 20, 10);
-        CountryEvaluator evaluator = new CountryEvaluator(bean);
-
-        assertEquals("MyIsland", evaluator.getData().getName());
-        assertEquals(2, evaluator.getValue());
+        assertEquals(2, CountryEvaluator.populationDensity(bean));
     }
 }

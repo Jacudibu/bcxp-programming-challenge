@@ -1,5 +1,7 @@
 package de.bcxp.challenge.parsing;
 
+import de.bcxp.challenge.data.CountryBean;
+import de.bcxp.challenge.data.WeatherBean;
 import de.bcxp.challenge.evaluator.CountryEvaluator;
 import de.bcxp.challenge.evaluator.WeatherEvaluator;
 import de.bcxp.challenge.utils.PathParser;
@@ -19,43 +21,52 @@ public class CSVFileParserTest {
     }
 
     @NotNull
-    private WeatherEvaluator parseWeather(String fileName) throws IOException {
+    private FileParserResult<WeatherBean, Integer> parseWeather(String fileName) throws IOException {
         Path path = getPath(fileName);
-        CSVFileParser parser = new CSVFileParser();
-        return parser.parse(path);
+
+        return new CSVFileParser<WeatherBean, Integer>(path)
+                .withClass(WeatherBean.class)
+                .withEvaluationFunction(WeatherEvaluator::temperatureDifference)
+                .withOrdering(Ordering.Smallest)
+                .parse();
     }
 
     @NotNull
-    private CountryEvaluator parseCountry(String fileName) throws IOException {
+    private FileParserResult<CountryBean, Float> parseCountry(String fileName) throws IOException {
         Path path = getPath(fileName);
-        CSVFileParser parser = new CSVFileParser();
-        return parser.parse_country(path);
+
+        return new CSVFileParser<CountryBean, Float>(path)
+                .withClass(CountryBean.class)
+                .withEvaluationFunction(CountryEvaluator::populationDensity)
+                .withSeparator(';')
+                .withOrdering(Ordering.Biggest)
+                .parse();
     }
 
     @Test
     void singleElement_shouldWork() throws Exception {
-        WeatherEvaluator result = parseWeather("single_weather.csv");
-        assertEquals(1, result.getData().getDay());
+        FileParserResult<WeatherBean, Integer> result = parseWeather("single_weather.csv");
+        assertEquals(1, result.data.getDay());
     }
 
     @Test
     void weatherFile_shouldWork() throws Exception {
-        WeatherEvaluator result = parseWeather("weather.csv");
-        assertEquals(14, result.getData().getDay());
+        FileParserResult<WeatherBean, Integer> result = parseWeather("weather.csv");
+        assertEquals(14, result.data.getDay());
     }
 
     @Test
     void countryFile_shouldWork() throws Exception {
-        CountryEvaluator result = parseCountry("countries.csv");
-        assertEquals(516100, result.getData().getPopulation());
-        assertEquals("Malta", result.getData().getName());
+        FileParserResult<CountryBean, Float> result = parseCountry("countries.csv");
+        assertEquals(516100, result.data.getPopulation());
+        assertEquals("Malta", result.data.getName());
     }
 
     @Test
     void countryFile_withWeirdPopulationFormatting_shouldWork() throws Exception {
-        CountryEvaluator result = parseCountry("countries_croatia.csv");
-        assertEquals(4036355, result.getData().getPopulation());
-        assertEquals("Croatia", result.getData().getName());
+        FileParserResult<CountryBean, Float> result = parseCountry("countries_croatia.csv");
+        assertEquals(4036355, result.data.getPopulation());
+        assertEquals("Croatia", result.data.getName());
     }
 
     @Test
