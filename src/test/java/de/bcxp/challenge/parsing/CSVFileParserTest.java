@@ -36,9 +36,9 @@ public class CSVFileParserTest {
         Path path = getPath(fileName);
 
         return new CSVFileParser<CountryBean, Float>(path)
+                .withSeparator(';')
                 .withClass(CountryBean.class)
                 .withEvaluationFunction(CountryEvaluator::populationDensity)
-                .withSeparator(';')
                 .withOrdering(Ordering.Biggest)
                 .parse();
     }

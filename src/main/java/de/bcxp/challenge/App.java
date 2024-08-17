@@ -50,10 +50,10 @@ public final class App {
         Path countryPath = PathParser.getPathToResourceFile("main", "countries.csv");
         try {
             FileParserResult<CountryBean, Float> result = new CSVFileParser<CountryBean, Float>(countryPath)
+                    .withSeparator(';')
                     .withClass(CountryBean.class)
                     .withEvaluationFunction(CountryEvaluator::populationDensity)
                     .withOrdering(Ordering.Biggest)
-                    .withSeparator(';')
                     .parse();
 
             return result.data.getName();
