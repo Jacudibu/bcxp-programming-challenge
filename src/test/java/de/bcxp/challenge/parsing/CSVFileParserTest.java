@@ -1,12 +1,12 @@
 package de.bcxp.challenge.parsing;
 
 import de.bcxp.challenge.evaluator.WeatherEvaluator;
+import de.bcxp.challenge.utils.PathParser;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CSVFileParserTest {
     @NotNull
     private Path getPath(String fileName) {
-        return Paths.get("src", "test", "resources", "de.bcxp.challenge", fileName);
+        return PathParser.getPathToResourceFile("test", fileName);
     }
 
     @NotNull
